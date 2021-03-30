@@ -19,7 +19,7 @@
 
 // ------ Private constants -----------------------------------
 #define MQTT_CLIENT_ID_STRING_MAX_SIZE       24U
-#define WIFI_PREFIX                           "VLW_"
+#define WIFI_PREFIX                           "FEC_"
 #define WIFI_PREFIX_LENGTH                    4
 
 // ------ Private function prototypes -------------------------
@@ -395,13 +395,13 @@ bool Wifi_begin() {
   wifi_client.setCACert(test_root_ca);
 
   AutoConnectConfig  auto_config(ssid, "12345678");
-  // auto_config.boundaryOffset = 256;
   auto_config.autoReconnect = true;
+  auto_config.reconnectInterval = 4; // Try to reconnect every 2 minutes
   auto_config.menuItems = AC_MENUITEM_CONFIGNEW|AC_MENUITEM_OPENSSIDS|AC_MENUITEM_DISCONNECT| AC_MENUITEM_RESET;
   auto_config.immediateStart = false;
-  auto_config.ticker = true;
-  auto_config.tickerPort = LED_BUILTIN;
-  auto_config.tickerOn = HIGH;
+  // auto_config.ticker = true;
+  // auto_config.tickerPort = LED_BUILTIN;
+  // auto_config.tickerOn = HIGH;
 
   portal.config(auto_config);
   portal.onDetect(MQTT_portalStartCallback);
@@ -489,12 +489,12 @@ void MQTT_IdInit()
   strncpy(ssid, (char*)WIFI_PREFIX, WIFI_PREFIX_LENGTH+1);
   strncat(ssid, chipId, CHIP_ID_HEX_STRING_LENGTH);
 
-  strncpy(mqttClientId, chipId, CHIP_ID_HEX_STRING_LENGTH);
+  strncpy(mqttClientId, ssid, CHIP_ID_HEX_STRING_LENGTH+WIFI_PREFIX_LENGTH);
 
   Serial.print("MQTT Client ID is: ");
-  Serial.println(chipId);
+  Serial.println(ssid);
 
-  mqtt.setClientId(chipId);
+  mqtt.setClientId(ssid);
 }
 //------------------------------------------
 #endif //__ESP32_MQTT_CPP
