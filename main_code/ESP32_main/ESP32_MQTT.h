@@ -21,9 +21,22 @@
 //#include "config.h"
 
 // ------ Public constants ------------------------------------
+#define COMPANY_NAME    FECTUM
+// #define COMPANY_NAME    SOLESTA
+
 #define WLAN_SSID     ""
 #define WLAN_PASS     ""
-#define VERSION       "RC 00.01"
+#define VERSION       "RC 00.02"
+
+#if (COMPANY_NAME == FECTUM)
+#define WIFI_PREFIX                           "FEC_"
+#elif (COMPANY_NAME == SOLESTA)
+#define WIFI_PREFIX                           "SOL_"
+#else
+#define WIFI_PREFIX                           "POM_"
+#endif
+
+#define WIFI_PREFIX_LENGTH                    4
 
 /******** MQTT Client Setup **********/
 // #define SERVER        "io.adafruit.com"                   //change it to your server
@@ -66,6 +79,7 @@
 #define CONFIRM_PRESENT_WAIT            86400000 // one full day
 
 #define CHIP_ID_HEX_STRING_LENGTH       13U      
+#define MQTT_CLIENT_ID_STRING_MAX_SIZE       24U
 
 // ------ Public function prototypes --------------------------
 /**

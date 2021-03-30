@@ -18,9 +18,6 @@
 #include "ESP32_NVS.h"
 
 // ------ Private constants -----------------------------------
-#define MQTT_CLIENT_ID_STRING_MAX_SIZE       24U
-#define WIFI_PREFIX                           "FEC_"
-#define WIFI_PREFIX_LENGTH                    4
 
 // ------ Private function prototypes -------------------------
 /**
