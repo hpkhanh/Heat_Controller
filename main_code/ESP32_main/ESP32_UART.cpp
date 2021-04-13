@@ -73,7 +73,7 @@ void UART_masterReady() {
   if ((millis()-uartLastMillis)>timeInterval*1000) {
     uartLastMillis = millis();
     char Smes[60];
-    snprintf(Smes,60,"T|%d|%d|%d|%d_F|%f",tempSen01_read(),tempSen02_read(),tempSen03_read(),tempSen04_read(),FlowSensor_get_flow_polling());
+    snprintf(Smes,60,"T|%d|%d|%d|%d_F|%f_PWM|%f",tempSen01_read(),tempSen02_read(),tempSen03_read(),tempSen04_read(),FlowSensor_get_flow_polling(),pump1pwm_read());
     Serial.println(Smes);
   }//end if
 }// end UART_sendToSlave

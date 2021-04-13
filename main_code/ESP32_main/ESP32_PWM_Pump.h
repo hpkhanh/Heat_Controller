@@ -22,7 +22,7 @@
 //--------------------------------------------------------------
 #define GRUNDFOS_UPM3_PWM //if using this pump, you must choose ONE profile below, slash out the others if you dont want to invite errors.
   //#define PROFILE_A_HEATING
- #define PROFILE_C_SOLAR
+#define PROFILE_C_SOLAR
 //#define YONOS_PARA_ST_15/13_PWM2
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,11 +44,11 @@
   #endif
   #ifdef PROFILE_C_SOLAR
     #define MAX_SPEED           0.95*PWM_RESOLUTION   // >90% and <= 100%, so 95% will be enough
-    #define MIN_SPEED           0.13*PWM_RESOLUTION   // >8% / <15% --> choose 13%
-    #define VAR_MAXSPEED        0.88*PWM_RESOLUTION   // <=90% --> choose 88%
+    #define MIN_SPEED           0.10*PWM_RESOLUTION   // >8% / <15% --> choose 13%
+    #define VAR_MAXSPEED        0.90*PWM_RESOLUTION   // <=90% --> choose 88%
     #define VAR_MINSPEED        0.17*PWM_RESOLUTION   // >15% --> choose 17%
     //hysteresis area lies in between 5% to 8%
-    #define OFF_MODE            0.03*PWM_RESOLUTION   // <5% --> choose 3% (Standby mode: Off)
+    #define OFF_MODE            0.00*PWM_RESOLUTION   // <5% --> choose 3% (Standby mode: Off)
   #endif
   //PWM feedback signal
   #define PUMP_STANDBY          0.95

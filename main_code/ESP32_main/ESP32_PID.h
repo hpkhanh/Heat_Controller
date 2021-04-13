@@ -20,6 +20,10 @@ PID initialize
 */
 void PID_init();
 /**
+Flow control PID initialize
+*/
+void F_PID_init();
+/**
 Read Kp value
 */
 float PID_Kp_read();
@@ -36,6 +40,10 @@ Fix Kp value
 */
 void PID_Kp_write(float);
 /**
+Fix Kp value
+*/
+void F_PID_Kp_write(float);
+/**
 Fix Ki value
 */
 void PID_Ki_write(float);
@@ -47,6 +55,11 @@ void PID_Kd_write(float);
 PID calculation, return value from 0.01 to 1.
 */
 float PIDcal(int,int);
+/**
+PID calculation, return value from 0.01 to 1.
+*/
+float F_PIDcal(int,int);
+
 // ------ Public variable -------------------------------------
 
 #endif //__ESP32_PID_H

@@ -23,8 +23,11 @@ Stable time: ~25 second.
 #ifndef  __ESP32_ADC_CPP 
 #define  __ESP32_ADC_CPP
 #include "ESP32_ADC.h"
+#include "Arduino.h"
+#include <ESP32AnalogRead.h>
 
 // ------ Private constants -----------------------------------
+ESP32AnalogRead adc;
 
 // ------ Private function prototypes -------------------------
 /**
@@ -44,9 +47,9 @@ SimpleKalmanFilter filter4(E_MEA, E_EST, QUE); //For T4
 //--------------------------------------------------------------
 void ADC_init() 
 {
-  analogReadResolution(11); // Default of 12 is not very linear. Recommended to use 10 or 11 depending on needed resolution.
-  analogSetWidth(11); //Range 0-2047
-  analogSetPinAttenuation(TEMP_SEN01_PIN, ADC_11db); // Default is 11db which is very noisy. Recommended to use 2.5 or 6.
+  analogReadResolution(12); // Default of 12 is not very linear. Recommended to use 10 or 11 depending on needed resolution.
+  analogSetWidth(12); //Range 0-4096
+  analogSetPinAttenuation(TEMP_SEN01_PIN, ADC_6db); // Default is 11db which is very noisy. Recommended to use 2.5 or 6.
   analogSetPinAttenuation(TEMP_SEN02_PIN, ADC_6db); // Default is 11db which is very noisy. Recommended to use 2.5 or 6.
   analogSetPinAttenuation(TEMP_SEN03_PIN, ADC_6db); // Default is 11db which is very noisy. Recommended to use 2.5 or 6.
   analogSetPinAttenuation(TEMP_SEN04_PIN, ADC_6db); // Default is 11db which is very noisy. Recommended to use 2.5 or 6.
@@ -60,7 +63,10 @@ int ADC_read(int ADCpin, int lowVal, int maxVal)
   // read the input on the corresponding analog pin:
   //if recieved signal is less than 4mA, than the sensor is off or is having some errors
   //if recieved signal is equal or more than 4mA (~360mV ~398 ADC value), than the sensor is working probaly
-  int senVal = analogRead(ADCpin);
+  //int senVal = analogRead(ADCpin);
+  //int senVal = analogRead(ADCpin);
+  adc.attach(ADCpin);
+  int senVal = adc.readMiliVolts();
   //------------------------------Kalman filter applied:
   int es_senVal = filter.updateEstimate(senVal); // first layer
   for (int a=1;a<FILTER_LAYER; a++) {        // next layers (if possible)
@@ -69,7 +75,7 @@ int ADC_read(int ADCpin, int lowVal, int maxVal)
   //------------------------------Kalman filter done
   if (es_senVal<200) //if sensor is off or error
     {return SENSOR_ERROR;} //use 200 for compensating for noises.
-  int calculatedVal = map(es_senVal,852,2047,lowVal,maxVal); //map es_senVal from 0-2047 to lowVal-maxVal
+  int calculatedVal = map(es_senVal,0,4096,lowVal,maxVal); //map es_senVal from 0-2047 to lowVal-maxVal
   return calculatedVal; //return the calculated value
 }//end ADC_read
 //------------------------------------------
@@ -81,53 +87,62 @@ int ADC_read(int ADCpin, int lowVal, int maxVal)
 //  return ADC_read(FLOW_SEN02_PIN,FLOW_MIN,FLOW_MAX);
 // }//end flowSen02_read
 //------------------------------------------
+// T1: Collector Temperature
 int tempSen01_read() {
-   int a1 = analogRead(TEMP_SEN01_PIN);
+  adc.attach(TEMP_SEN01_PIN);
+  int a1 = adc.readMiliVolts();
   //------------------------------Kalman filter applied:
   int es_senVal1 = filter1.updateEstimate(a1); // first layer
   for (int a=1;a<FILTER_LAYER; a++) {        // next layers (if possible)
     es_senVal1 = filter1.updateEstimate(es_senVal1);   
   }//end for
   //------------------------------Kalman filter done
-  int t1= map(es_senVal1,-1023,1060,TEMP_MAX,TEMP_MIN);
-  t1 = 4*t1;   
+  //int t1= map(es_senVal1,0,4096,TEMP_MAX,TEMP_MIN);
+  int t1 = es_senVal1;   
   return t1;
 }//end tempSen01_read
 //------------------------------------------
+//T2: Buffer below temperature
 int tempSen02_read() {
-   int a2 = analogRead(FLOW_SEN02_PIN);
+  adc.attach(TEMP_SEN02_PIN);
+  int a2 = adc.readMiliVolts();
   //------------------------------Kalman filter applied:
   int es_senVal2 = filter2.updateEstimate(a2); // first layer
   for (int a=1;a<FILTER_LAYER; a++) {        // next layers (if possible)
     es_senVal2 = filter2.updateEstimate(es_senVal2);   
   }//end for
   //------------------------------Kalman filter done
-  int t2=map(es_senVal2,950,2047,FLOW_MIN,FLOW_MAX);
-  t2 = 4*t2;  
+  //int t2=map(es_senVal2,0,4096,TEMP_MAX,TEMP_MIN);
+  int t2 = es_senVal2;  
   return t2;
 }//end tempSen02_read
 //------------------------------------------
+//T3: Buffer top temperature
 int tempSen03_read() {
-   int a3 = analogRead(FLOW_SEN01_PIN);
+  adc.attach(TEMP_SEN03_PIN);
+  int a3 = adc.readMiliVolts();
   //------------------------------Kalman filter applied:
   int es_senVal3 = filter3.updateEstimate(a3); // first layer
   for (int a=1;a<FILTER_LAYER; a++) {        // next layers (if possible)
     es_senVal3 = filter3.updateEstimate(es_senVal3);   
   }//end for
   //------------------------------Kalman filter done
-  int t3=map(es_senVal3,935,2047,FLOW_MIN,FLOW_MAX); 
-  t3 = 4*t3; 
+  //int t3=map(es_senVal3,0,4096,TEMP_MAX,TEMP_MIN); 
+  int t3 = es_senVal3;
   return t3;
 }//end tempSen03_read
 //------------------------------------------
+//T4: Temperature of the cooled down water from the radiator (warming up the house). 
 int tempSen04_read() {
-   int a4 = analogRead(TEMP_SEN04_PIN);
+  adc.attach(TEMP_SEN04_PIN);
+  int a4 = adc.readMiliVolts();
   //------------------------------Kalman filter applied:
   int es_senVal4 = filter4.updateEstimate(a4); // first layer
   for (int a=1;a<FILTER_LAYER; a++) {        // next layers (if possible)
     es_senVal4 = filter4.updateEstimate(es_senVal4);   
   }//end for
-  int t4=map(es_senVal4,852,2047,TEMP_MAX,TEMP_MIN);  
+  //int t4=map(es_senVal4,0,4096,TEMP_MAX,TEMP_MIN);
+  int t4 = es_senVal4;  
   return t4;
 }//end tempSen04_read
 //------------------------------------------

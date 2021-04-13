@@ -18,11 +18,10 @@
 #include "ESP32_relay.h"
 #include "ESP32_PWM_Pump.h"
 #include "ESP32_UART.h"
+#include "debugConfig.h"
 //#include "config.h"
 
 // ------ Public constants ------------------------------------
-#define COMPANY_NAME    FECTUM
-// #define COMPANY_NAME    SOLESTA
 
 #define WLAN_SSID     ""
 #define WLAN_PASS     ""
