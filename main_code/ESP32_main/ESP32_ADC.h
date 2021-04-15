@@ -35,7 +35,22 @@
 #define TEMP_SEN02_PIN 35
 #define TEMP_SEN03_PIN 32
 #define TEMP_SEN04_PIN 33
+
+#define TEMP_CS_PIN_01        33
+#define TEMP_DRDYN_PIN_01     35
+#define TEMP_CS_PIN_02        32
+#define TEMP_DRDYN_PIN_02     34
+#define TEMP_CS_PIN_03        12
+#define TEMP_DRDYN_PIN_03     13
+#define TEMP_CS_PIN_04        5
+#define TEMP_DRDYN_PIN_04     2
+
 #define SENSOR_ERROR   9999
+
+
+#define RREF                  2000.0
+#define RNOMINAL              100.0
+
 //KALMAN FILTER PARAMETERS
 #define FILTER_LAYER  2 //increase this if you want to reduce the noise, but be careful, it will make the system response slower! 
 #define E_MEA 3     //Measurement Uncertainty - How much do we expect to our measurement vary

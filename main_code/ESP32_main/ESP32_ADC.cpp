@@ -24,10 +24,17 @@ Stable time: ~25 second.
 #define  __ESP32_ADC_CPP
 #include "ESP32_ADC.h"
 #include "Arduino.h"
+#include <Adafruit_MAX31865.h>
 #include <ESP32AnalogRead.h>
+#include <Wire.h>
+#include "debugConfig.h"
 
 // ------ Private constants -----------------------------------
 ESP32AnalogRead adc;
+Adafruit_MAX31865 adc_temp_01 = Adafruit_MAX31865(TEMP_CS_PIN_01);
+Adafruit_MAX31865 adc_temp_02 = Adafruit_MAX31865(TEMP_CS_PIN_02);
+Adafruit_MAX31865 adc_temp_03 = Adafruit_MAX31865(TEMP_CS_PIN_03);
+Adafruit_MAX31865 adc_temp_04 = Adafruit_MAX31865(TEMP_CS_PIN_04);
 
 // ------ Private function prototypes -------------------------
 /**
@@ -47,15 +54,16 @@ SimpleKalmanFilter filter4(E_MEA, E_EST, QUE); //For T4
 //--------------------------------------------------------------
 void ADC_init() 
 {
-  analogReadResolution(12); // Default of 12 is not very linear. Recommended to use 10 or 11 depending on needed resolution.
-  analogSetWidth(12); //Range 0-4096
-  analogSetPinAttenuation(TEMP_SEN01_PIN, ADC_6db); // Default is 11db which is very noisy. Recommended to use 2.5 or 6.
-  analogSetPinAttenuation(TEMP_SEN02_PIN, ADC_6db); // Default is 11db which is very noisy. Recommended to use 2.5 or 6.
-  analogSetPinAttenuation(TEMP_SEN03_PIN, ADC_6db); // Default is 11db which is very noisy. Recommended to use 2.5 or 6.
-  analogSetPinAttenuation(TEMP_SEN04_PIN, ADC_6db); // Default is 11db which is very noisy. Recommended to use 2.5 or 6.
-  analogSetPinAttenuation(FLOW_SEN01_PIN, ADC_11db); // Must use 11db because of the module MDCB042
-  analogSetPinAttenuation(FLOW_SEN02_PIN, ADC_11db); // Must use 11db because of the module MDCB042
-  //analogSetAttenuation(ADC_6db); // This can be used for all ADC pins, but not recommended.
+  adc_temp_01.begin(MAX31865_3WIRE);
+#if (COMPANY_NAME == FECTUM)
+  adc_temp_02.begin(MAX31865_3WIRE);
+  adc_temp_03.begin(MAX31865_3WIRE);
+  adc_temp_04.begin(MAX31865_3WIRE);
+#elif (COMPANY_NAME == SOLESTA)
+  adc_temp_02.begin(MAX31865_2WIRE);
+  adc_temp_03.begin(MAX31865_2WIRE);
+  adc_temp_04.begin(MAX31865_2WIRE);
+#endif
 }//end ADC_init
 //------------------------------------------
 int ADC_read(int ADCpin, int lowVal, int maxVal)
@@ -78,14 +86,6 @@ int ADC_read(int ADCpin, int lowVal, int maxVal)
   int calculatedVal = map(es_senVal,0,4096,lowVal,maxVal); //map es_senVal from 0-2047 to lowVal-maxVal
   return calculatedVal; //return the calculated value
 }//end ADC_read
-//------------------------------------------
-// int flowSen01_read() {
-//  return ADC_read(FLOW_SEN01_PIN,FLOW_MIN,FLOW_MAX);
-// }//end flowSen01_read
-//------------------------------------------
-// int flowSen02_read() {
-//  return ADC_read(FLOW_SEN02_PIN,FLOW_MIN,FLOW_MAX);
-// }//end flowSen02_read
 //------------------------------------------
 // T1: Collector Temperature
 int tempSen01_read() {

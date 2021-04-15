@@ -25,7 +25,6 @@
 
 #define WLAN_SSID     ""
 #define WLAN_PASS     ""
-#define VERSION       "RC 00.02"
 
 #if (COMPANY_NAME == FECTUM)
 #define WIFI_PREFIX                           "FEC_"
