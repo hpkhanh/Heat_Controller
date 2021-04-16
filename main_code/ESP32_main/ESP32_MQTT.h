@@ -76,7 +76,11 @@
 #define PING_TIMES  10
 #define CONFIRM_PRESENT_WAIT            86400000 // one full day
 
-#define CHIP_ID_HEX_STRING_LENGTH       13U      
+#define CHIP_ID_HEX_STRING_LENGTH       13U
+#define WIFI_SSID_STRING_LENGTH         (CHIP_ID_HEX_STRING_LENGTH + WIFI_PREFIX_LENGTH)
+#define MQTT_MESSAGE_STRING_MAX_SIZE         255 
+#define MQTT_MESSAGE_STRING_MAX_APPEND       250
+#define MQTT_MESSAGE_VALUE_MAX_SIZE          12
 #define MQTT_CLIENT_ID_STRING_MAX_SIZE       24U
 
 // ------ Public function prototypes --------------------------

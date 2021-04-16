@@ -78,7 +78,7 @@ const char* test_root_ca= \
 bool subscribed = false;
 char chipId[CHIP_ID_HEX_STRING_LENGTH];
 char mqttClientId[MQTT_CLIENT_ID_STRING_MAX_SIZE];
-char ssid[CHIP_ID_HEX_STRING_LENGTH+WIFI_PREFIX_LENGTH];
+char ssid[WIFI_SSID_STRING_LENGTH];
 
 Adafruit_MQTT_Client mqtt(&wifi_client, SERVER, PORT, CLIENT_ID, USERNAME, PASS); // Setup the MQTT client class by passing in the WiFi client and MQTT server and login details.;
 //PUBLISH
@@ -125,9 +125,9 @@ void MQTT_subscribeInit()
   if ((WiFi.status() == WL_CONNECTED) && (false == subscribed))
   {
     bool succeeded = true;
-    char offlineMess[24];
-    strncpy(offlineMess, chipId, CHIP_ID_HEX_STRING_LENGTH);
-    strncat(offlineMess, (char*)" - Offline", CHIP_ID_HEX_STRING_LENGTH);
+    char offlineMess[MQTT_MESSAGE_STRING_MAX_SIZE];
+    strncpy(offlineMess, ssid, WIFI_SSID_STRING_LENGTH);
+    strncat(offlineMess, (char*)" - Offline", MQTT_MESSAGE_STRING_MAX_APPEND);
     succeeded &= mqtt.will (LWT_TOPIC, (char*)offlineMess, MQTT_QOS_1, LWT_RETAIN); //Set up last will
     succeeded &=mqtt.subscribe(&sub_kp); // Set up MQTT subscriptions.
     succeeded &=mqtt.subscribe(&sub_ki); // Set up MQTT subscriptions.
@@ -149,9 +149,9 @@ void MQTT_subscribeInit()
 
 void MQTT_appearOnline()
 {
-  char onlineMess[24];
-  strncpy(onlineMess, chipId, CHIP_ID_HEX_STRING_LENGTH);
-  strncat(onlineMess, (char*)" - Online", CHIP_ID_HEX_STRING_LENGTH);
+  char onlineMess[MQTT_MESSAGE_STRING_MAX_SIZE];
+  strncpy(onlineMess, ssid, WIFI_SSID_STRING_LENGTH);
+  strncat(onlineMess, (char*)" - Online", MQTT_MESSAGE_STRING_MAX_APPEND);
   lastShownOnline = millis();
   publishStringNow(availability, (char*)onlineMess, RETAIN,"Status Failed!","Status updated!");
   Serial.println(onlineMess);
@@ -278,21 +278,21 @@ void publishStringNow(Adafruit_MQTT_Publish topicPub, char* MQTTmessage, bool re
 
 void publishStringIdPrefix(Adafruit_MQTT_Publish topicPub, char* MQTTmessage, const char* failed, const char* success)
 {
-  char mess[30];
-  strncpy(mess, chipId, CHIP_ID_HEX_STRING_LENGTH);
+  char mess[MQTT_MESSAGE_STRING_MAX_SIZE];
+  strncpy(mess, ssid, WIFI_SSID_STRING_LENGTH);
   strncat(mess, " - ", 3);
-  strncat(mess, MQTTmessage, 12);
+  strncat(mess, MQTTmessage, MQTT_MESSAGE_STRING_MAX_APPEND);
   publishStringNow(topicPub, mess , RETAIN, failed, success);
 }
 
 void publishIntIdPrefix(Adafruit_MQTT_Publish topicPub, int MQTTmessage, const char* failed, const char* success)
 {
-  char mess[30];
-  char value[11];
+  char mess[MQTT_MESSAGE_STRING_MAX_SIZE];
+  char value[MQTT_MESSAGE_VALUE_MAX_SIZE];
   itoa(MQTTmessage, value, 10);
-  strncpy(mess, chipId, CHIP_ID_HEX_STRING_LENGTH);
+  strncpy(mess, ssid, WIFI_SSID_STRING_LENGTH);
   strncat(mess, " - ", 3);
-  strncat(mess, value, 11);
+  strncat(mess, value, MQTT_MESSAGE_VALUE_MAX_SIZE);
   publishStringNow(topicPub, mess , RETAIN, failed, success);
 }
 
@@ -324,12 +324,12 @@ void publishNow(Adafruit_MQTT_Publish topicPub,float MQTTmessage, bool retained,
 
 void publishFloatIdPrefix(Adafruit_MQTT_Publish topicPub, float MQTTmessage, const char* failed, const char* success)
 {
-  char mess[30];
-  char value[11];
+  char mess[MQTT_MESSAGE_STRING_MAX_SIZE];
+  char value[MQTT_MESSAGE_VALUE_MAX_SIZE];
   dtostrf(MQTTmessage, 10, 2, value);
-  strncpy(mess, chipId, CHIP_ID_HEX_STRING_LENGTH);
+  strncpy(mess, ssid, WIFI_SSID_STRING_LENGTH);
   strncat(mess, " - ", 3);
-  strncat(mess, value, 11);
+  strncat(mess, value, MQTT_MESSAGE_VALUE_MAX_SIZE);
   publishStringNow(topicPub, mess , RETAIN, failed, success);
 }
 
@@ -486,7 +486,7 @@ void MQTT_IdInit()
   strncpy(ssid, (char*)WIFI_PREFIX, WIFI_PREFIX_LENGTH+1);
   strncat(ssid, chipId, CHIP_ID_HEX_STRING_LENGTH);
 
-  strncpy(mqttClientId, ssid, CHIP_ID_HEX_STRING_LENGTH+WIFI_PREFIX_LENGTH);
+  strncpy(mqttClientId, ssid, WIFI_SSID_STRING_LENGTH);
 
   Serial.print("MQTT Client ID is: ");
   Serial.println(ssid);

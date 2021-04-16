@@ -41,6 +41,10 @@ Adafruit_MAX31865 adc_temp_04 = Adafruit_MAX31865(TEMP_CS_PIN_04);
 Read value of the ADC 
 **/
 int ADC_read(int,int,int);
+#if (MAX31865_DEBUG)
+void ADC_max31865_resistance_debug(Adafruit_MAX31865 max_id);
+#endif
+
 // ------ Private variables -----------------------------------
 SimpleKalmanFilter filter(E_MEA, E_EST, QUE); //For flow sensors, we don't have one so we cannot test it
 SimpleKalmanFilter filter1(E_MEA, E_EST, QUE); //For T1
@@ -87,9 +91,25 @@ int ADC_read(int ADCpin, int lowVal, int maxVal)
   return calculatedVal; //return the calculated value
 }//end ADC_read
 //------------------------------------------
+
+#if (MAX31865_DEBUG)
+void ADC_max31865_resistance_debug(Adafruit_MAX31865 max_id)
+{
+  uint16_t raw_resistance = max_id.readRTD();
+  Serial.print("Raw Resistance Input:");
+  Serial.println(raw_resistance);
+  float resistance = raw_resistance / 32768 * RREF;
+  Serial.print("Calculated Resistance:");
+  Serial.println(resistance);
+}
+#endif
+
 // T1: Collector Temperature
 int tempSen01_read() {
   float es_senVal1 = adc_temp_01.temperature(RNOMINAL, RREF);
+#if (MAX31865_DEBUG)
+  ADC_max31865_resistance_debug(adc_temp_01);
+#endif
 #if (USE_KALMAN_FILTER)
   //------------------------------Kalman filter applied:
   es_senVal1 = filter1.updateEstimate(es_senVal1); // first layer
@@ -106,6 +126,9 @@ int tempSen01_read() {
 //T2: Buffer below temperature
 int tempSen02_read() {
   float es_senVal2 = adc_temp_02.temperature(RNOMINAL, RREF);
+#if (MAX31865_DEBUG)
+  ADC_max31865_resistance_debug(adc_temp_02);
+#endif
 #if (USE_KALMAN_FILTER)
   //------------------------------Kalman filter applied:
   es_senVal2 = filter2.updateEstimate(es_senVal2); // first layer
@@ -122,6 +145,9 @@ int tempSen02_read() {
 //T3: Buffer top temperature
 int tempSen03_read() {
   float es_senVal3 = adc_temp_03.temperature(RNOMINAL, RREF);
+#if (MAX31865_DEBUG)
+  ADC_max31865_resistance_debug(adc_temp_03);
+#endif
 #if (USE_KALMAN_FILTER)
   //------------------------------Kalman filter applied:
   es_senVal3 = filter3.updateEstimate(es_senVal3); // first layer
@@ -138,6 +164,9 @@ int tempSen03_read() {
 //T4: Temperature of the cooled down water from the radiator (warming up the house). 
 int tempSen04_read() {
   float es_senVal4 = adc_temp_04.temperature(RNOMINAL, RREF);
+#if (MAX31865_DEBUG)
+  ADC_max31865_resistance_debug(adc_temp_04);
+#endif
 #if (USE_KALMAN_FILTER)
   //------------------------------Kalman filter applied:
   es_senVal4 = filter4.updateEstimate(es_senVal4); // first layer
