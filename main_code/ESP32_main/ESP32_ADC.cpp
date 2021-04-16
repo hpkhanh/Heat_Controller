@@ -42,7 +42,7 @@ Read value of the ADC
 **/
 int ADC_read(int,int,int);
 #if (MAX31865_DEBUG)
-void ADC_max31865_resistance_debug(Adafruit_MAX31865 max_id);
+void ADC_max31865_resistance_debug(Adafruit_MAX31865 * max_id);
 #endif
 
 // ------ Private variables -----------------------------------
@@ -93,9 +93,9 @@ int ADC_read(int ADCpin, int lowVal, int maxVal)
 //------------------------------------------
 
 #if (MAX31865_DEBUG)
-void ADC_max31865_resistance_debug(Adafruit_MAX31865 max_id)
+void ADC_max31865_resistance_debug(Adafruit_MAX31865 * max_id)
 {
-  uint16_t raw_resistance = max_id.readRTD();
+  uint16_t raw_resistance = max_id->readRTD();
   Serial.print("Raw Resistance Input:");
   Serial.println(raw_resistance);
   float resistance = raw_resistance / 32768 * RREF;
@@ -108,7 +108,7 @@ void ADC_max31865_resistance_debug(Adafruit_MAX31865 max_id)
 int tempSen01_read() {
   float es_senVal1 = adc_temp_01.temperature(RNOMINAL, RREF);
 #if (MAX31865_DEBUG)
-  ADC_max31865_resistance_debug(adc_temp_01);
+  ADC_max31865_resistance_debug(&adc_temp_01);
 #endif
 #if (USE_KALMAN_FILTER)
   //------------------------------Kalman filter applied:
@@ -127,7 +127,7 @@ int tempSen01_read() {
 int tempSen02_read() {
   float es_senVal2 = adc_temp_02.temperature(RNOMINAL, RREF);
 #if (MAX31865_DEBUG)
-  ADC_max31865_resistance_debug(adc_temp_02);
+  ADC_max31865_resistance_debug(&adc_temp_02);
 #endif
 #if (USE_KALMAN_FILTER)
   //------------------------------Kalman filter applied:
@@ -146,7 +146,7 @@ int tempSen02_read() {
 int tempSen03_read() {
   float es_senVal3 = adc_temp_03.temperature(RNOMINAL, RREF);
 #if (MAX31865_DEBUG)
-  ADC_max31865_resistance_debug(adc_temp_03);
+  ADC_max31865_resistance_debug(&adc_temp_03);
 #endif
 #if (USE_KALMAN_FILTER)
   //------------------------------Kalman filter applied:
@@ -165,7 +165,7 @@ int tempSen03_read() {
 int tempSen04_read() {
   float es_senVal4 = adc_temp_04.temperature(RNOMINAL, RREF);
 #if (MAX31865_DEBUG)
-  ADC_max31865_resistance_debug(adc_temp_04);
+  ADC_max31865_resistance_debug(&adc_temp_04);
 #endif
 #if (USE_KALMAN_FILTER)
   //------------------------------Kalman filter applied:

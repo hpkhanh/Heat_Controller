@@ -15,6 +15,8 @@
 //#define SYSTEM_DEBUG
 #define SERIAL_OUTPUT  1
 
+#define FECTUM                0
+#define SOLESTA               1
 // #define COMPANY_NAME    FECTUM
 #define COMPANY_NAME    SOLESTA
 
