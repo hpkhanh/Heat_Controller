@@ -18,6 +18,8 @@
 #define COMPANY_NAME    FECTUM
 // #define COMPANY_NAME    SOLESTA
 
+#define USE_KALMAN_FILTER     0
+
 #define VERSION       "RC 00.03"
 
 #ifdef SYSTEM_DEBUG // When this is active, every log will be execute.

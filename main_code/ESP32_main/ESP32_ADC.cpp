@@ -20,8 +20,8 @@
 
 Stable time: ~25 second.
 */
-#ifndef  __ESP32_ADC_CPP 
-#define  __ESP32_ADC_CPP
+#ifndef ESP32_ADC
+#define ESP32_ADC
 #include "ESP32_ADC.h"
 #include "Arduino.h"
 #include <Adafruit_MAX31865.h>
@@ -63,7 +63,7 @@ void ADC_init()
   adc_temp_02.begin(MAX31865_2WIRE);
   adc_temp_03.begin(MAX31865_2WIRE);
   adc_temp_04.begin(MAX31865_2WIRE);
-#endif
+#endif /* ESP32_ADC */
 }//end ADC_init
 //------------------------------------------
 int ADC_read(int ADCpin, int lowVal, int maxVal)
@@ -89,14 +89,15 @@ int ADC_read(int ADCpin, int lowVal, int maxVal)
 //------------------------------------------
 // T1: Collector Temperature
 int tempSen01_read() {
-  adc.attach(TEMP_SEN01_PIN);
-  int a1 = adc.readMiliVolts();
+  float es_senVal1 = adc_temp_01.temperature(RNOMINAL, RREF);
+#if (USE_KALMAN_FILTER)
   //------------------------------Kalman filter applied:
-  int es_senVal1 = filter1.updateEstimate(a1); // first layer
+  es_senVal1 = filter1.updateEstimate(es_senVal1); // first layer
   for (int a=1;a<FILTER_LAYER; a++) {        // next layers (if possible)
     es_senVal1 = filter1.updateEstimate(es_senVal1);   
   }//end for
   //------------------------------Kalman filter done
+#endif
   //int t1= map(es_senVal1,0,4096,TEMP_MAX,TEMP_MIN);
   int t1 = es_senVal1;   
   return t1;
@@ -104,14 +105,15 @@ int tempSen01_read() {
 //------------------------------------------
 //T2: Buffer below temperature
 int tempSen02_read() {
-  adc.attach(TEMP_SEN02_PIN);
-  int a2 = adc.readMiliVolts();
+  float es_senVal2 = adc_temp_02.temperature(RNOMINAL, RREF);
+#if (USE_KALMAN_FILTER)
   //------------------------------Kalman filter applied:
-  int es_senVal2 = filter2.updateEstimate(a2); // first layer
+  es_senVal2 = filter2.updateEstimate(es_senVal2); // first layer
   for (int a=1;a<FILTER_LAYER; a++) {        // next layers (if possible)
     es_senVal2 = filter2.updateEstimate(es_senVal2);   
   }//end for
   //------------------------------Kalman filter done
+#endif
   //int t2=map(es_senVal2,0,4096,TEMP_MAX,TEMP_MIN);
   int t2 = es_senVal2;  
   return t2;
@@ -119,14 +121,15 @@ int tempSen02_read() {
 //------------------------------------------
 //T3: Buffer top temperature
 int tempSen03_read() {
-  adc.attach(TEMP_SEN03_PIN);
-  int a3 = adc.readMiliVolts();
+  float es_senVal3 = adc_temp_03.temperature(RNOMINAL, RREF);
+#if (USE_KALMAN_FILTER)
   //------------------------------Kalman filter applied:
-  int es_senVal3 = filter3.updateEstimate(a3); // first layer
+  es_senVal3 = filter3.updateEstimate(es_senVal3); // first layer
   for (int a=1;a<FILTER_LAYER; a++) {        // next layers (if possible)
     es_senVal3 = filter3.updateEstimate(es_senVal3);   
   }//end for
   //------------------------------Kalman filter done
+#endif
   //int t3=map(es_senVal3,0,4096,TEMP_MAX,TEMP_MIN); 
   int t3 = es_senVal3;
   return t3;
@@ -134,13 +137,15 @@ int tempSen03_read() {
 //------------------------------------------
 //T4: Temperature of the cooled down water from the radiator (warming up the house). 
 int tempSen04_read() {
-  adc.attach(TEMP_SEN04_PIN);
-  int a4 = adc.readMiliVolts();
+  float es_senVal4 = adc_temp_04.temperature(RNOMINAL, RREF);
+#if (USE_KALMAN_FILTER)
   //------------------------------Kalman filter applied:
-  int es_senVal4 = filter4.updateEstimate(a4); // first layer
+  es_senVal4 = filter4.updateEstimate(es_senVal4); // first layer
   for (int a=1;a<FILTER_LAYER; a++) {        // next layers (if possible)
     es_senVal4 = filter4.updateEstimate(es_senVal4);   
   }//end for
+  //------------------------------Kalman filter done
+#endif
   //int t4=map(es_senVal4,0,4096,TEMP_MAX,TEMP_MIN);
   int t4 = es_senVal4;  
   return t4;
