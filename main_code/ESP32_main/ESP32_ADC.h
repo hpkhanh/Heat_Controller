@@ -43,7 +43,7 @@
 #define TEMP_CS_PIN_03        12
 #define TEMP_DRDYN_PIN_03     13
 #define TEMP_CS_PIN_04        5
-#define TEMP_DRDYN_PIN_04     2
+#define TEMP_DRDYN_PIN_04     16
 
 #define SENSOR_ERROR   9999
 

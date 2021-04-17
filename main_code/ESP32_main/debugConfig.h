@@ -22,7 +22,7 @@
 
 #define USE_KALMAN_FILTER     0
 
-#define MAX31865_DEBUG        1
+#define MAX31865_DEBUG        0
 
 #define VERSION       "RC 00.04"
 

@@ -58,7 +58,7 @@ SimpleKalmanFilter filter4(E_MEA, E_EST, QUE); //For T4
 //--------------------------------------------------------------
 void ADC_init() 
 {
-  adc_temp_01.begin(MAX31865_3WIRE);
+  adc_temp_01.begin(MAX31865_3WIRE);  
 #if (COMPANY_NAME == FECTUM)
   adc_temp_02.begin(MAX31865_3WIRE);
   adc_temp_03.begin(MAX31865_3WIRE);
@@ -67,7 +67,7 @@ void ADC_init()
   adc_temp_02.begin(MAX31865_2WIRE);
   adc_temp_03.begin(MAX31865_2WIRE);
   adc_temp_04.begin(MAX31865_2WIRE);
-#endif /* ESP32_ADC */
+#endif /* COMPANY_NAME */
 }//end ADC_init
 //------------------------------------------
 int ADC_read(int ADCpin, int lowVal, int maxVal)
@@ -98,7 +98,7 @@ void ADC_max31865_resistance_debug(Adafruit_MAX31865 * max_id)
   uint16_t raw_resistance = max_id->readRTD();
   Serial.print("Raw Resistance Input:");
   Serial.println(raw_resistance);
-  float resistance = raw_resistance / 32768 * RREF;
+  float resistance = raw_resistance * RREF / 32768;
   Serial.print("Calculated Resistance:");
   Serial.println(resistance);
 }
@@ -106,9 +106,10 @@ void ADC_max31865_resistance_debug(Adafruit_MAX31865 * max_id)
 
 // T1: Collector Temperature
 int tempSen01_read() {
+  adc_temp_01.begin(MAX31865_3WIRE);
   float es_senVal1 = adc_temp_01.temperature(RNOMINAL, RREF);
 #if (MAX31865_DEBUG)
-  ADC_max31865_resistance_debug(&adc_temp_01);
+  // ADC_max31865_resistance_debug(&adc_temp_01);
 #endif
 #if (USE_KALMAN_FILTER)
   //------------------------------Kalman filter applied:
@@ -125,6 +126,11 @@ int tempSen01_read() {
 //------------------------------------------
 //T2: Buffer below temperature
 int tempSen02_read() {
+#if (COMPANY_NAME == FECTUM)
+  adc_temp_02.begin(MAX31865_3WIRE);
+#elif (COMPANY_NAME == SOLESTA)
+  adc_temp_02.begin(MAX31865_2WIRE);
+#endif /* COMPANY_NAME */
   float es_senVal2 = adc_temp_02.temperature(RNOMINAL, RREF);
 #if (MAX31865_DEBUG)
   ADC_max31865_resistance_debug(&adc_temp_02);
@@ -144,9 +150,14 @@ int tempSen02_read() {
 //------------------------------------------
 //T3: Buffer top temperature
 int tempSen03_read() {
+#if (COMPANY_NAME == FECTUM)
+  adc_temp_03.begin(MAX31865_3WIRE);
+#elif (COMPANY_NAME == SOLESTA)
+  adc_temp_03.begin(MAX31865_2WIRE);
+#endif /* COMPANY_NAME */
   float es_senVal3 = adc_temp_03.temperature(RNOMINAL, RREF);
 #if (MAX31865_DEBUG)
-  ADC_max31865_resistance_debug(&adc_temp_03);
+  // ADC_max31865_resistance_debug(&adc_temp_03);
 #endif
 #if (USE_KALMAN_FILTER)
   //------------------------------Kalman filter applied:
@@ -163,9 +174,14 @@ int tempSen03_read() {
 //------------------------------------------
 //T4: Temperature of the cooled down water from the radiator (warming up the house). 
 int tempSen04_read() {
+#if (COMPANY_NAME == FECTUM)
+  adc_temp_04.begin(MAX31865_3WIRE);
+#elif (COMPANY_NAME == SOLESTA)
+  adc_temp_04.begin(MAX31865_2WIRE);
+#endif /* COMPANY_NAME */
   float es_senVal4 = adc_temp_04.temperature(RNOMINAL, RREF);
 #if (MAX31865_DEBUG)
-  ADC_max31865_resistance_debug(&adc_temp_04);
+  // ADC_max31865_resistance_debug(&adc_temp_04);
 #endif
 #if (USE_KALMAN_FILTER)
   //------------------------------Kalman filter applied:
