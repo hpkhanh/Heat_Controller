@@ -107,6 +107,7 @@ void ADC_max31865_resistance_debug(Adafruit_MAX31865 * max_id)
 // T1: Collector Temperature
 int tempSen01_read() {
   adc_temp_01.begin(MAX31865_3WIRE);
+  uint16_t raw_rtd = adc_temp_01.readRTD();
   float es_senVal1 = adc_temp_01.temperature(RNOMINAL, RREF);
 #if (MAX31865_DEBUG)
   // ADC_max31865_resistance_debug(&adc_temp_01);
@@ -120,7 +121,17 @@ int tempSen01_read() {
   //------------------------------Kalman filter done
 #endif
   //int t1= map(es_senVal1,0,4096,TEMP_MAX,TEMP_MIN);
-  int t1 = es_senVal1;   
+  uint8_t fault = adc_temp_01.readFault();
+  int t1;
+  if ((raw_rtd > RTD_THRESHOLD_LOW) && (raw_rtd < RTD_THRESHOLD_HIGH) && ((fault & RTD_ALL_FAULT_MASK) == 0))
+  {
+    t1 = es_senVal1;
+  }
+  else
+  {
+    t1 = DEFAULT_TEMP_01;
+  }
+  
   return t1;
 }//end tempSen01_read
 //------------------------------------------

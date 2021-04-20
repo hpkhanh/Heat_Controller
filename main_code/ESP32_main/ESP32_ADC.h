@@ -26,6 +26,8 @@
 //--------------------------------------------------------------
 #define TEMP_MIN 0    //put the mininum value of your temperature sensor here
 #define TEMP_MAX 4096  //put the maximum value of your temperature sensor here 2047
+
+#define DEFAULT_TEMP_01       200
 //--------------------------------------------------------------
 // ADC
 //--------------------------------------------------------------
@@ -50,6 +52,9 @@
 
 #define RREF                  2000.0
 #define RNOMINAL              100.0
+#define RTD_THRESHOLD_HIGH    0x7FF0
+#define RTD_THRESHOLD_LOW     0x0005
+#define RTD_ALL_FAULT_MASK    0xFC
 
 //KALMAN FILTER PARAMETERS
 #define FILTER_LAYER  2 //increase this if you want to reduce the noise, but be careful, it will make the system response slower! 
