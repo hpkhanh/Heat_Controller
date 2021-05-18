@@ -27,7 +27,7 @@
 #define TEMP_MIN 0    //put the mininum value of your temperature sensor here
 #define TEMP_MAX 4096  //put the maximum value of your temperature sensor here 2047
 
-#define DEFAULT_TEMP_01       200
+#define DEFAULT_TEMP_01       300
 //--------------------------------------------------------------
 // ADC
 //--------------------------------------------------------------

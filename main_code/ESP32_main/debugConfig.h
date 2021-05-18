@@ -24,7 +24,7 @@
 
 #define MAX31865_DEBUG        0
 
-#define VERSION       "RC 00.04"
+#define VERSION       "RC 00.05"
 
 #ifdef SYSTEM_DEBUG // When this is active, every log will be execute.
   #ifndef SERIAL_OUTPUT

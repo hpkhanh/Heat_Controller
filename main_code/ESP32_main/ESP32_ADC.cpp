@@ -42,8 +42,9 @@ Read value of the ADC
 **/
 int ADC_read(int,int,int);
 #if (MAX31865_DEBUG)
-void ADC_max31865_resistance_debug(Adafruit_MAX31865 * max_id);
+void ADC_max31865_resistance_debug(Adafruit_MAX31865 & max_id);
 #endif
+uint16_t ADC_read_temp_default(Adafruit_MAX31865 & max_id);
 
 // ------ Private variables -----------------------------------
 SimpleKalmanFilter filter(E_MEA, E_EST, QUE); //For flow sensors, we don't have one so we cannot test it
@@ -93,9 +94,9 @@ int ADC_read(int ADCpin, int lowVal, int maxVal)
 //------------------------------------------
 
 #if (MAX31865_DEBUG)
-void ADC_max31865_resistance_debug(Adafruit_MAX31865 * max_id)
+void ADC_max31865_resistance_debug(Adafruit_MAX31865 & max_id)
 {
-  uint16_t raw_resistance = max_id->readRTD();
+  uint16_t raw_resistance = max_id.readRTD();
   Serial.print("Raw Resistance Input:");
   Serial.println(raw_resistance);
   float resistance = raw_resistance * RREF / 32768;
@@ -104,35 +105,36 @@ void ADC_max31865_resistance_debug(Adafruit_MAX31865 * max_id)
 }
 #endif
 
-// T1: Collector Temperature
-int tempSen01_read() {
-  adc_temp_01.begin(MAX31865_3WIRE);
-  uint16_t raw_rtd = adc_temp_01.readRTD();
-  float es_senVal1 = adc_temp_01.temperature(RNOMINAL, RREF);
-#if (MAX31865_DEBUG)
-  // ADC_max31865_resistance_debug(&adc_temp_01);
-#endif
+uint16_t ADC_read_temp_default(Adafruit_MAX31865 & max_id)
+{
+  uint16_t raw_rtd = max_id.readRTD();
+  float es_senVal = max_id.temperature(RNOMINAL, RREF); 
 #if (USE_KALMAN_FILTER)
   //------------------------------Kalman filter applied:
-  es_senVal1 = filter1.updateEstimate(es_senVal1); // first layer
+  es_senVal = filter1.updateEstimate(es_senVal); // first layer
   for (int a=1;a<FILTER_LAYER; a++) {        // next layers (if possible)
-    es_senVal1 = filter1.updateEstimate(es_senVal1);   
+    es_senVal = filter1.updateEstimate(es_senVal);   
   }//end for
   //------------------------------Kalman filter done
 #endif
-  //int t1= map(es_senVal1,0,4096,TEMP_MAX,TEMP_MIN);
-  uint8_t fault = adc_temp_01.readFault();
-  int t1;
+  uint8_t fault = max_id.readFault();
+  int temp;
   if ((raw_rtd > RTD_THRESHOLD_LOW) && (raw_rtd < RTD_THRESHOLD_HIGH) && ((fault & RTD_ALL_FAULT_MASK) == 0))
   {
-    t1 = es_senVal1;
+    temp = es_senVal;
   }
   else
   {
-    t1 = DEFAULT_TEMP_01;
+    temp = DEFAULT_TEMP_01;
   }
   
-  return t1;
+  return temp;
+}
+
+// T1: Collector Temperature
+int tempSen01_read() {
+  adc_temp_01.begin(MAX31865_3WIRE);
+  return ADC_read_temp_default(adc_temp_01);
 }//end tempSen01_read
 //------------------------------------------
 //T2: Buffer below temperature
@@ -142,21 +144,7 @@ int tempSen02_read() {
 #elif (COMPANY_NAME == SOLESTA)
   adc_temp_02.begin(MAX31865_2WIRE);
 #endif /* COMPANY_NAME */
-  float es_senVal2 = adc_temp_02.temperature(RNOMINAL, RREF);
-#if (MAX31865_DEBUG)
-  ADC_max31865_resistance_debug(&adc_temp_02);
-#endif
-#if (USE_KALMAN_FILTER)
-  //------------------------------Kalman filter applied:
-  es_senVal2 = filter2.updateEstimate(es_senVal2); // first layer
-  for (int a=1;a<FILTER_LAYER; a++) {        // next layers (if possible)
-    es_senVal2 = filter2.updateEstimate(es_senVal2);   
-  }//end for
-  //------------------------------Kalman filter done
-#endif
-  //int t2=map(es_senVal2,0,4096,TEMP_MAX,TEMP_MIN);
-  int t2 = es_senVal2;  
-  return t2;
+  return ADC_read_temp_default(adc_temp_02);
 }//end tempSen02_read
 //------------------------------------------
 //T3: Buffer top temperature
@@ -166,21 +154,7 @@ int tempSen03_read() {
 #elif (COMPANY_NAME == SOLESTA)
   adc_temp_03.begin(MAX31865_2WIRE);
 #endif /* COMPANY_NAME */
-  float es_senVal3 = adc_temp_03.temperature(RNOMINAL, RREF);
-#if (MAX31865_DEBUG)
-  // ADC_max31865_resistance_debug(&adc_temp_03);
-#endif
-#if (USE_KALMAN_FILTER)
-  //------------------------------Kalman filter applied:
-  es_senVal3 = filter3.updateEstimate(es_senVal3); // first layer
-  for (int a=1;a<FILTER_LAYER; a++) {        // next layers (if possible)
-    es_senVal3 = filter3.updateEstimate(es_senVal3);   
-  }//end for
-  //------------------------------Kalman filter done
-#endif
-  //int t3=map(es_senVal3,0,4096,TEMP_MAX,TEMP_MIN); 
-  int t3 = es_senVal3;
-  return t3;
+  return ADC_read_temp_default(adc_temp_03);
 }//end tempSen03_read
 //------------------------------------------
 //T4: Temperature of the cooled down water from the radiator (warming up the house). 
@@ -190,21 +164,7 @@ int tempSen04_read() {
 #elif (COMPANY_NAME == SOLESTA)
   adc_temp_04.begin(MAX31865_2WIRE);
 #endif /* COMPANY_NAME */
-  float es_senVal4 = adc_temp_04.temperature(RNOMINAL, RREF);
-#if (MAX31865_DEBUG)
-  // ADC_max31865_resistance_debug(&adc_temp_04);
-#endif
-#if (USE_KALMAN_FILTER)
-  //------------------------------Kalman filter applied:
-  es_senVal4 = filter4.updateEstimate(es_senVal4); // first layer
-  for (int a=1;a<FILTER_LAYER; a++) {        // next layers (if possible)
-    es_senVal4 = filter4.updateEstimate(es_senVal4);   
-  }//end for
-  //------------------------------Kalman filter done
-#endif
-  //int t4=map(es_senVal4,0,4096,TEMP_MAX,TEMP_MIN);
-  int t4 = es_senVal4;  
-  return t4;
+  return ADC_read_temp_default(adc_temp_04);
 }//end tempSen04_read
 //------------------------------------------
 #endif //__ESP32_ADC_CPP
