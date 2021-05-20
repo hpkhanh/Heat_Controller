@@ -18,13 +18,13 @@
 #define FECTUM                0
 #define SOLESTA               1
 // #define COMPANY_NAME    FECTUM
-#define COMPANY_NAME    SOLESTA
+#define COMPANY_NAME          SOLESTA
 
 #define USE_KALMAN_FILTER     0
 
 #define MAX31865_DEBUG        0
 
-#define VERSION       "RC 00.05"
+#define VERSION               "RC 00.06"
 
 #ifdef SYSTEM_DEBUG // When this is active, every log will be execute.
   #ifndef SERIAL_OUTPUT

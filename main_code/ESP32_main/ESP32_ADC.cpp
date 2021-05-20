@@ -60,15 +60,9 @@ SimpleKalmanFilter filter4(E_MEA, E_EST, QUE); //For T4
 void ADC_init() 
 {
   adc_temp_01.begin(MAX31865_3WIRE);  
-#if (COMPANY_NAME == FECTUM)
   adc_temp_02.begin(MAX31865_3WIRE);
   adc_temp_03.begin(MAX31865_3WIRE);
   adc_temp_04.begin(MAX31865_3WIRE);
-#elif (COMPANY_NAME == SOLESTA)
-  adc_temp_02.begin(MAX31865_2WIRE);
-  adc_temp_03.begin(MAX31865_2WIRE);
-  adc_temp_04.begin(MAX31865_2WIRE);
-#endif /* COMPANY_NAME */
 }//end ADC_init
 //------------------------------------------
 int ADC_read(int ADCpin, int lowVal, int maxVal)
@@ -139,31 +133,19 @@ int tempSen01_read() {
 //------------------------------------------
 //T2: Buffer below temperature
 int tempSen02_read() {
-#if (COMPANY_NAME == FECTUM)
   adc_temp_02.begin(MAX31865_3WIRE);
-#elif (COMPANY_NAME == SOLESTA)
-  adc_temp_02.begin(MAX31865_2WIRE);
-#endif /* COMPANY_NAME */
   return ADC_read_temp_default(adc_temp_02);
 }//end tempSen02_read
 //------------------------------------------
 //T3: Buffer top temperature
 int tempSen03_read() {
-#if (COMPANY_NAME == FECTUM)
   adc_temp_03.begin(MAX31865_3WIRE);
-#elif (COMPANY_NAME == SOLESTA)
-  adc_temp_03.begin(MAX31865_2WIRE);
-#endif /* COMPANY_NAME */
   return ADC_read_temp_default(adc_temp_03);
 }//end tempSen03_read
 //------------------------------------------
 //T4: Temperature of the cooled down water from the radiator (warming up the house). 
 int tempSen04_read() {
-#if (COMPANY_NAME == FECTUM)
   adc_temp_04.begin(MAX31865_3WIRE);
-#elif (COMPANY_NAME == SOLESTA)
-  adc_temp_04.begin(MAX31865_2WIRE);
-#endif /* COMPANY_NAME */
   return ADC_read_temp_default(adc_temp_04);
 }//end tempSen04_read
 //------------------------------------------
